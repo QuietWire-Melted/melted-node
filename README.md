@@ -8,7 +8,6 @@ Offline-first porch node for 5-second attestations: capture → hash → commit 
 3) Configure CUPS printer queue name in .env (MELTED_PRINTER)
 4) Test: `python scripts/capture.py --text "Let the waters flow."`
 5) Serve local: `python scripts/web.py` then open http://localhost:8080
-# Melted Civic Node — Top‑Level READMEs
 
 * `.env.example` – baseline environment variables.
 * `requirements.txt` – Python dependencies.
