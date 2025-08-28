@@ -20,11 +20,17 @@ def ensure_day_dir(ts):
     return p
 
 def take_photo(dev="auto", path="photo.jpg"):
-    cam = cv2.VideoCapture(0 if dev=="auto" else dev)
-    ok, frame = cam.read()
-    cam.release()
-    if not ok: raise RuntimeError("Camera capture failed")
-    cv2.imwrite(path, frame)
+    """Return True on success, False if camera is unavailable."""
+    try:
+        cam = cv2.VideoCapture(0 if dev=="auto" else dev)
+        ok, frame = cam.read()
+        cam.release()
+        if not ok:
+            return False
+        cv2.imwrite(path, frame)
+        return True
+    except Exception:
+        return False
 
 def record_audio(seconds, path="audio.wav", samplerate=16000):
     audio = sd.rec(int(seconds*samplerate), samplerate=samplerate, channels=1, dtype='int16')
@@ -39,6 +45,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--text", required=True, help="short utterance")
     ap.add_argument("--visibility", default="public", choices=["public","first-name","anonymous"])
+    ap.add_argument("--no-photo", action="store_true", help="skip photo capture (or if camera missing)")
     args = ap.parse_args()
 
     ts = now_iso()
@@ -48,7 +55,9 @@ def main():
     audio = daydir/"tmp_audio.wav"
     photo = daydir/"tmp_photo.jpg"
     record_audio(CFG.get("duration_sec",5), str(audio))
-    take_photo(CFG["camera"]["device"], str(photo))
+    photo_ok = False
+    if not args.no_photo and CFG.get("camera", {}).get("enabled", True):
+        photo_ok = take_photo(CFG["camera"].get("device","auto"), str(photo))
 
     # compute id/hash
     hasher = hashlib.blake2b(digest_size=16)
@@ -61,8 +70,11 @@ def main():
     # final filenames
     a_id = sid
     final_audio = daydir/f"{a_id}_audio.wav"
-    final_photo = daydir/f"{a_id}_photo.jpg"
-    audio.rename(final_audio); photo.rename(final_photo)
+    audio.rename(final_audio)
+    final_photo = None
+    if (daydir/"tmp_photo.jpg").exists() and photo_ok:
+        final_photo = daydir/f"{a_id}_photo.jpg"
+        (daydir/"tmp_photo.jpg").rename(final_photo)
 
     # write JSON record
     rec = {
@@ -72,7 +84,7 @@ def main():
         "text": args.text.strip(),
         "media": {
             "audio": str(final_audio),
-            "photo": str(final_photo)
+            "photo": (str(final_photo) if final_photo else None)
         },
         "hash": digest,
         "tags":[]
