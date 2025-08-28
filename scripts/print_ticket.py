@@ -1,26 +1,35 @@
-python - <<'PY'
+#!/usr/bin/env python3
+import os, subprocess, sys
 from pathlib import Path
-p = Path("scripts/print_ticket.py")
-s = p.read_text()
-if "print(" not in s or "lp -d" in s:
-    s = s.replace(
-        'printer = os.environ.get("MELTED_PRINTER","melted_printer")\nsubprocess.run(["lp","-d",printer,str(tfile)], check=False)\n',
-        'printer = os.environ.get("MELTED_PRINTER")\n'
-        'print(f"🖨️  Requested printer: {printer or \"<system-default>\"}")\n'
-        'cmd = ["lp"] + (["-d", printer] if printer else []) + [str(tfile)]\n'
-        'r = subprocess.run(cmd, capture_output=True, text=True)\n'
-        'if r.returncode != 0:\n'
-        '    print("lp error:", r.stderr.strip())\n'
-        '    # Fallback to system default if a specific queue failed\n'
-        '    if printer:\n'
-        '        print("↪️  Retrying on system default…")\n'
-        '        subprocess.run(["lp", str(tfile)], check=False)\n'
-    )
-    p.write_text(s)
-    print("Patched scripts/print_ticket.py (debug + default fallback)")
-PY
 
-git add scripts/print_ticket.py
-git commit -m "print_ticket: log selected printer and fallback to system default if queue missing"
-git push
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: print_ticket.py <ATT_ID>")
+        sys.exit(1)
+
+    att_id = sys.argv[1]
+    tfile = Path("attestations") / Path(att_id[0:4]) / Path(att_id[5:7]) / Path(att_id[8:10]) / f"{att_id}.ticket.txt"
+
+    if not tfile.exists():
+        print(f"Ticket file not found: {tfile}")
+        sys.exit(1)
+
+    # Which printer to use
+    printer = os.environ.get("MELTED_PRINTER")
+    print(f"🖨️  Requested printer: {printer or '<system-default>'}")
+
+    # Build lp command
+    cmd = ["lp"] + (["-d", printer] if printer else []) + [str(tfile)]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+
+    if r.returncode != 0:
+        print("lp error:", r.stderr.strip())
+        if printer:
+            print("↪️  Retrying on system default…")
+            subprocess.run(["lp", str(tfile)], check=False)
+    else:
+        print(r.stdout.strip())
+
+if __name__ == "__main__":
+    main()
 
