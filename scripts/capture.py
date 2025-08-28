@@ -61,8 +61,10 @@ def main():
 
     # compute id/hash
     hasher = hashlib.blake2b(digest_size=16)
-    for p in (audio, photo):
-        with open(p,"rb") as f: hasher.update(f.read())
+    for pth in (audio, photo):
+        if Path(pth).exists():
+            with open(pth, "rb") as f:
+                hasher.update(f.read())
     hasher.update(args.text.encode())
     digest = hasher.hexdigest()
     sid = make_short_id(digest, ts)
