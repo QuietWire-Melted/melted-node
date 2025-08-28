@@ -1,6 +1,14 @@
-# Melted Civic Node – Scripts
+## 📂 Melted Civic Node`scripts/` — Runtime Utilities
 
-This folder contains the helper scripts that power the Melted Civic Node.
+**Purpose:** This folder contains the helper scripts that power the Melted Civic Node.
+
+**Highlights**
+
+* `capture.py` – record, hash, commit, print ticket.
+* `print_ticket.py` – reprint a ticket by Attestation ID (Windows‑aware).
+* `win_print.py` – Windows print shim (uses `pywin32`).
+* `web.py` – local viewer/UI for recent attestations.
+* `shortid.py` – ID generator.
 
 ---
 
@@ -75,3 +83,25 @@ python scripts\win_print.py attestations\2025\08\27\OL5I-H663.ticket.txt "Canon 
 * **`web.py`** – serves the local web UI (default port: 8090 on Foundry).
 * **`shortid.py`** – generates short unique attestation IDs.
 * **`print_ticket.py`** – described above.
+
+## 🗂️ Root files
+
+* `.env.example` – baseline environment variables.
+* `requirements.txt` – Python dependencies.
+* `README.md` – project overview and quick start.
+
+**Root README quick‑start (suggested snippet)**
+
+````markdown
+# Melted Civic Node (Six Nations)
+
+Offline‑first attestation point at the Melted Dispensary: capture → hash → commit → ticket → local serve → sync.
+
+## Quick start
+```bash
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt python-dotenv
+cp .env.example .env && nano .env   # set MELTED_PRINTER, port, etc.
+python scripts/capture.py --text "You are remembered." --visibility public --no-photo
+python scripts/web.py   # open http://localhost:8090
+````
