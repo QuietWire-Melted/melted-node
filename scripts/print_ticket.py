@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, subprocess, sys
+import os, sys, subprocess, platform
 from pathlib import Path
 
 def find_ticket(att_id: str) -> Path | None:
@@ -18,18 +18,28 @@ def main():
         print(f"Ticket file not found for ID: {att_id}")
         sys.exit(1)
 
-    printer = os.environ.get("MELTED_PRINTER")  # if unset, use system default
-    print(f"🖨️  Printer target: {printer or '<system-default>'}")
-    cmd = ["lp"] + (["-d", printer] if printer else []) + [str(tfile)]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    printer = os.environ.get("MELTED_PRINTER")  # optional override
 
-    if r.returncode != 0:
-        print("lp error:", r.stderr.strip())
-        if printer:  # retry on system default
-            print("↪️  Retrying on system default…")
-            subprocess.run(["lp", str(tfile)], check=False)
+    if platform.system() == "Windows":
+        # Use the shim
+        cmd = ["python", "scripts/win_print.py", str(tfile)]
+        if printer:
+            cmd.append(printer)
+        print(f"🖨️  Windows print via: {' '.join(cmd)}")
+        subprocess.run(cmd, check=False)
     else:
-        print(r.stdout.strip())
+        # Use lp (Linux/macOS with CUPS)
+        cmd = ["lp"]
+        if printer:
+            cmd += ["-d", printer]
+        cmd.append(str(tfile))
+        print(f"🖨️  Unix print via: {' '.join(cmd)}")
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode != 0:
+            print("lp error:", r.stderr.strip())
+            if printer:
+                print("↪️  Retrying on system default…")
+                subprocess.run(["lp", str(tfile)], check=False)
 
 if __name__ == "__main__":
     main()
