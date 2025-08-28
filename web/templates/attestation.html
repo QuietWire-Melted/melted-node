@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8">
+<title>Melted — {{ a.id }}</title>
+<link rel="stylesheet" href="/static/style.css">
+<h1>🌿 Melted Civic Node</h1>
+<p><strong>ID:</strong> {{ a.id }} • <strong>Time:</strong> {{ a.timestamp }}</p>
+{% if a.media.photo %}<img src="{{ a.media.photo_rel }}" alt="attestation photo" style="max-width:360px">{% endif %}
+<blockquote>{{ a.text }}</blockquote>
+<p>Visibility: {{ a.visibility }}</p>
+<a href="/">← Back</a>

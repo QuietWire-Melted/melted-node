@@ -1,0 +1,8 @@
+🌿 MELTED NODE — Civic Attestation Receipt
+Date: {date}    Time: {time}
+ID: {id}
+You spoke:
+“{quote}”
+Reflection:
+Presence remembered. Voice carried forward.
+Scan: {url}

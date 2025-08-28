@@ -1,0 +1,21 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"Attestation",
+  "type":"object",
+  "required":["id","timestamp","visibility","text","media","hash"],
+  "properties":{
+    "id":{"type":"string"},
+    "timestamp":{"type":"string","format":"date-time"},
+    "visibility":{"enum":["public","first-name","anonymous"]},
+    "text":{"type":"string"},
+    "media":{
+      "type":"object",
+      "properties":{
+        "audio":{"type":"string"},
+        "photo":{"type":"string"}
+      }
+    },
+    "hash":{"type":"string"},
+    "tags":{"type":"array","items":{"type":"string"}}
+  }
+}

@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8">
+<title>Melted — Attestations</title>
+<link rel="stylesheet" href="/static/style.css">
+<h1>🌿 Melted Civic Node — Latest</h1>
+<ul>
+{% for item in items %}
+  <li><a href="/a/{{ item.id }}">{{ item.timestamp }} — {{ item.text|e }}</a></li>
+{% endfor %}
+</ul>

@@ -1,0 +1,17 @@
+node_name: "Melted Civic Node (Six Nations)"
+timezone: "America/Toronto"
+invite_prompt: "You have five seconds. Speak what you carry."
+seal_prompt: "You are remembered."
+camera:
+  device: "auto"      # e.g. /dev/video0
+audio:
+  device: "default"   # arecord/capture backend used by sounddevice
+duration_sec: 5
+privacy:
+  default_visibility: "public"  # public|first-name|anonymous
+ticket:
+  header: "MELTED NODE"
+  reflection_line: "Presence remembered. Voice carried forward."
+web:
+  base_url_public: "https://quietwire.ai/melted"
+  base_url_local: "http://melted-node.local"
