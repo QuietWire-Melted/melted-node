@@ -14,11 +14,9 @@ def main():
         print(f"Ticket file not found: {tfile}")
         sys.exit(1)
 
-    # Which printer to use
     printer = os.environ.get("MELTED_PRINTER")
     print(f"🖨️  Requested printer: {printer or '<system-default>'}")
 
-    # Build lp command
     cmd = ["lp"] + (["-d", printer] if printer else []) + [str(tfile)]
     r = subprocess.run(cmd, capture_output=True, text=True)
 
@@ -32,4 +30,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
